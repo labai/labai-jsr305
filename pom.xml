@@ -1,0 +1,17 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.labai</groupId>
+    <artifactId>labai-jaxb-jsr305-root</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Extension for JAXB maven plugin (root)</name>
+
+    <modules>
+        <module>labai-jsr305-jaxb-plugin</module>
+        <module>labai-jsr305x-annotations</module>
+        <module>samples/jaxb-kotlin-sample</module>
+    </modules>
+
+</project>

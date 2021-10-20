@@ -1,0 +1,39 @@
+<xs:schema
+		xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		targetNamespace="nonnulltest"
+		xmlns:a="nonnulltest"
+		elementFormDefault="qualified">
+
+	<xs:element name="first" type="a:First"/>
+	<xs:element name="second" type="a:Second"/>
+
+	<xs:complexType name="First">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="minOccurs0" type="xs:string"/>
+			<xs:element minOccurs="1" maxOccurs="1" nillable="true" name="nillableOverMinOccurs" type="xs:string"/>
+			<xs:element minOccurs="1" name="minOccurs1" type="xs:string"/>
+			<xs:element nillable="false" name="nillableFalse" type="xs:string"/>
+			<xs:element name="logical" type="xs:boolean"/>
+			<xs:element minOccurs="1" name="isOk" type="xs:boolean"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Second">
+		<xs:sequence>
+
+			<!-- list getter always not null-->
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="list1" type="xs:string"/>
+
+			<!-- todo nice to have to make single choice as nonnull as well -->
+			<xs:element minOccurs="0" name="singleChoice2" >
+				<xs:complexType>
+					<xs:choice>
+						<xs:element name="Single2" type="xs:string"/>
+					</xs:choice>
+				</xs:complexType>
+			</xs:element>
+
+		</xs:sequence>
+	</xs:complexType>
+
+</xs:schema>
