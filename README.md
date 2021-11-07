@@ -57,7 +57,7 @@ See samples/jaxb-kotlin-sample.
         <dependency>
             <groupId>com.github.labai</groupId>
             <artifactId>labai-jsr305-jaxb-plugin</artifactId>
-            <version>0.0.3</version>
+            <version>0.0.4</version>
         </dependency>
         <dependency>
             <groupId>com.github.labai</groupId>
