@@ -5,7 +5,7 @@
 
     <groupId>com.github.labai</groupId>
     <artifactId>labai-jsr305x-annotations</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <packaging>jar</packaging>
 
     <name>labai-jsr305x-annotations</name>

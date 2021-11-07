@@ -11,6 +11,6 @@ import java.lang.annotation.ElementType;
  */
 
 @Nonnull(when = When.MAYBE)
-@TypeQualifierDefault({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.TYPE_USE})
+@TypeQualifierDefault({ElementType.FIELD, ElementType.METHOD, ElementType.PACKAGE, ElementType.TYPE})
 public @interface NullableByDefault {
 }

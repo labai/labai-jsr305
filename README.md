@@ -1,7 +1,7 @@
 # labai-jaxb-jsr305
 
 ## About
-Extension for jaxb maven plugin for generating @Nonnull annotation on mandatory fields.
+Extension for jaxb maven plugin for generating @NotNull annotation on mandatory fields.
 
 ### Purpose
 
@@ -10,7 +10,7 @@ In most cases it is not true for classes, generated from xsd.
 If to reverse to nullable by default, it also will not always be true, as some fields 
 are not nullable by xsd scheme.
 
-This plugin adds @javax.annotation.Nonnull annotation on those fields, which are mandatory by xsd. 
+This plugin adds @NotNull annotation on those fields, which are mandatory by xsd. 
 It adds nullable-by-default annotation on package level also.
 
 
@@ -34,6 +34,7 @@ See samples/jaxb-kotlin-sample.
         <args>
             <arg>-extension</arg>
             <arg>-XJsr305Annotations</arg>
+            <arg>-XJsr305Annotations:generateListItemNonnull=true</arg>
         </args>
     </configuration>
 
@@ -56,12 +57,12 @@ See samples/jaxb-kotlin-sample.
         <dependency>
             <groupId>com.github.labai</groupId>
             <artifactId>labai-jsr305-jaxb-plugin</artifactId>
-            <version>0.0.2</version>
+            <version>0.0.3</version>
         </dependency>
         <dependency>
             <groupId>com.github.labai</groupId>
             <artifactId>labai-jsr305x-annotations</artifactId>
-            <version>0.0.1</version>
+            <version>0.0.2</version>
         </dependency>
     </dependencies>
 </plugin>
@@ -72,7 +73,7 @@ Also you will need to add dependency:
 <dependency>
     <groupId>com.github.labai</groupId>
     <artifactId>labai-jsr305x-annotations</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
 </dependency>
 ```
 
@@ -84,9 +85,10 @@ Then you may provide additional parameters:
 
 | Parameter | Description | Default
 | :--- | :--- | :---
-| -XJsr305Annotations:nonnullClass | @Notnull annotation on field, method or parameter | @javax.annotation.Nonnull
+| -XJsr305Annotations:nonnullClass | @Notnull annotation on field, method or parameter | @com.github.labai.jsr305x.api.NotNull
 | -XJsr305Annotations:defaultNullableClass | @NullableByDefault on package-info.java (default for all package) | @com.github.labai.jsr305x.api.NullableByDefault
 | -XJsr305Annotations:generateDefaultNullable | generate @NullableByDefault | true |
+| -XJsr305Annotations:generateListItemNonnull | generate @NotNull for list items, e.g. List<@NotNull Item> | false |
 | -XJsr305Annotations:verbose | More logs | true |
 
 An example:
@@ -94,5 +96,6 @@ An example:
 ```xml
 <arg>-XJsr305Annotations:defaultNullableClass=org.your.DefaultNullable</arg>
 <arg>-XJsr305Annotations:nonnullClass=org.your.NonNull</arg>
+<arg>-XJsr305Annotations:generateListItemNonnull=true</arg>
 ```
 

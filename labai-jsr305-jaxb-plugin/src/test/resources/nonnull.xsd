@@ -22,7 +22,7 @@
 		<xs:sequence>
 
 			<!-- list getter always not null-->
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="list1" type="xs:string"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="list2" type="xs:string"/>
 
 			<!-- todo nice to have to make single choice as nonnull as well -->
 			<xs:element minOccurs="0" name="singleChoice2" >

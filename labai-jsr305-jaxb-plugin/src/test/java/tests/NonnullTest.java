@@ -13,7 +13,7 @@ check in generated code:
 	package-info.java
 		should have @NullableByDefault annotation (or provided by params)
 	data structure classes
-		should have @Nonnull (where it is required)
+		should have @NotNull (where it is required)
 
 */
 public class NonnullTest extends RunXJC2Mojo {
@@ -40,6 +40,7 @@ public class NonnullTest extends RunXJC2Mojo {
 	public List<String> getArgs() {
 		final List<String> args = new ArrayList<>(super.getArgs());
 		args.add("-XJsr305Annotations");
+		args.add("-XJsr305Annotations:generateListItemNonnull=true");
 //		args.add("-XJsr305Annotations:defaultNullableClass=tests.DummyDefaultNullable");
 //		args.add("-XJsr305Annotations:nonnullClass=tests.DummyNonnull");
 		return args;
