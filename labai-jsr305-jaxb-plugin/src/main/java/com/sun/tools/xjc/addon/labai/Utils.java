@@ -2,11 +2,28 @@ package com.sun.tools.xjc.addon.labai;
 
 import java.lang.reflect.Field;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /*
  * utils
-*/
+ */
 class Utils {
+
+    private static final List<String> baseTypes = Arrays.asList(
+            "java.lang.String",
+            "java.lang.Integer",
+            "java.lang.Long",
+            "java.lang.Boolean",
+            "java.lang.Double",
+            "java.lang.Float",
+            "java.lang.Short",
+            "java.lang.Byte"
+    );
+
+    private static final Map<String, String> baseTypeMap = baseTypes.stream().collect(Collectors.toMap(s -> s, s -> s.substring(s.lastIndexOf(".") + 1)));
 
     static int toInt(Object maxOccurs) {
         if (maxOccurs instanceof BigInteger) {
@@ -66,4 +83,9 @@ class Utils {
         return null;
     }
 
+    // use "String" instead of "java.lang.String" for few base java classes.
+    // used to avoid such structures "List<@NotNull java.lang.String> list1" (doesn't compile in java 8)
+    static String shortenClassName(String className) {
+        return baseTypeMap.getOrDefault(className, className);
+    }
 }

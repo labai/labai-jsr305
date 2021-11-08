@@ -302,7 +302,7 @@ public class JaxbNonnullPlugin extends Plugin {
             this.origTp = origTp;
             this.nonnullName = nonnullName;
         }
-        @Override public String fullName() { return "@" + nonnullName + " " + origTp.fullName(); }
+        @Override public String fullName() { return "@" + nonnullName + " " + Utils.shortenClassName(origTp.fullName()); }
         @Override public String name() { return "@" + nonnullName + " " + origTp.name(); }
         @Override public JPackage _package() { return origTp._package(); }
         @Override public JClass _extends() { return origTp._extends(); }
