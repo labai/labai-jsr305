@@ -11,7 +11,10 @@ If to reverse to nullable by default, it also will not always be true, as some f
 are not nullable by xsd scheme.
 
 This plugin adds @NotNull annotation on those fields, which are mandatory by xsd. 
-It adds nullable-by-default annotation on package level also.
+It adds nullable-by-default annotation on package level also. 
+
+For kotlin it will make fields, which can't be null by xsd, as non-nullable - no need for '?' or '!!' operators.
+Other fields are nullable and you need to handle null case.
 
 
 ### Usage
