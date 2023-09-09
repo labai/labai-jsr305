@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>labai-jsr305-example</groupId>
+    <artifactId>example3-iss1-ebms</artifactId>
+    <version>0.0.1</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>8</java.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.labai</groupId>
+            <artifactId>labai-jsr305x-annotations</artifactId>
+            <version>0.0.2</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${project.build.directory}/generated-resources</directory>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+
+            <!--
+                 XSD
+             -->
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.13.3</version>
+
+                <configuration>
+                    <args>
+                        <!-- Allow JAXB extensions -->
+                        <arg>-extension</arg>
+                        <arg>-Xnamespace-prefix</arg>
+                    </args>
+                </configuration>
+                <executions>
+
+                    <execution>
+                        <id>ebms</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaDirectory>src/main/resources/xsd/ebms</schemaDirectory>
+                            <bindingDirectory>src/main/resources/xsd/ebms</bindingDirectory>
+                            <generatePackage>example3.generated.ebms</generatePackage>
+                            <schemaIncludes>
+                                <includeSchema>cpp-cpa-2_0.xsd</includeSchema>
+                            </schemaIncludes>
+                            <bindingIncludes>
+                                <includeBinding>cpp-cpa-2_0.xjc</includeBinding>
+                            </bindingIncludes>
+                            <forceRegenerate>true</forceRegenerate>
+                            <args>
+                                <arg>-XJsr305Annotations</arg>
+                                <arg>-XJsr305Annotations:generateListItemNonnull=true</arg>
+                            </args>
+                        </configuration>
+                    </execution>
+
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jvnet.jaxb2_commons</groupId>
+                        <artifactId>jaxb2-namespace-prefix</artifactId>
+                        <version>1.3</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.3.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-runtime</artifactId>
+                        <version>2.3.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.github.labai</groupId>
+                        <artifactId>labai-jsr305-jaxb-plugin</artifactId>
+                        <version>0.0.5</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.github.labai</groupId>
+                        <artifactId>labai-jsr305x-annotations</artifactId>
+                        <version>0.0.2</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+        </plugins>
+    </build>
+</project>
