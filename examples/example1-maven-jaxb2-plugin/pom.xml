@@ -65,15 +65,15 @@
                 <executions>
 
                     <execution>
-                        <id>xsd.pain.001.001.11</id>
+                        <id>xsd.seev.031.001.13</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <schemaDirectory>src/main/resources/xsd/pain.001.001.11</schemaDirectory>
+                            <schemaDirectory>src/main/resources/xsd/seev.031.001.13</schemaDirectory>
                             <bindingDirectory>src/main/resources/xsd/config</bindingDirectory>
-                            <generatePackage>example1.generated.pain_001_001_11</generatePackage>
+                            <generatePackage>example1.generated.seev_031_001_13</generatePackage>
                             <forceRegenerate>true</forceRegenerate>
                             <args>
                                 <arg>-XJsr305Annotations</arg>

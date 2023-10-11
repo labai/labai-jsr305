@@ -83,9 +83,8 @@ class Utils {
         return null;
     }
 
-    // use "String" instead of "java.lang.String" for few base java classes.
-    // used to avoid such structures "List<@NotNull java.lang.String> list1" (doesn't compile in java 8)
-    static String shortenClassName(String className) {
-        return baseTypeMap.getOrDefault(className, className);
+    // use short ("String") instead of full ("java.lang.String") for few base java classes.
+    static String tryShortenStdClassName(String className) {
+        return baseTypeMap.get(className);
     }
 }

@@ -302,14 +302,31 @@ public class JaxbNonnullPlugin extends Plugin {
             this.origTp = origTp;
             this.nonnullName = nonnullName;
         }
-        @Override public String fullName() { return "@" + nonnullName + " " + Utils.shortenClassName(origTp.fullName()); }
-        @Override public String name() { return "@" + nonnullName + " " + origTp.name(); }
+        @Override public String fullName() { return formatGenericNonnull(nonnullName, origTp.fullName()); }
+        @Override public String name() { return formatGenericNonnull(nonnullName, origTp.name()); }
         @Override public JPackage _package() { return origTp._package(); }
         @Override public JClass _extends() { return origTp._extends(); }
         @Override public Iterator<JClass> _implements() { return origTp._implements(); }
         @Override public boolean isInterface() { return origTp.isInterface(); }
         @Override public boolean isAbstract() { return origTp.isAbstract(); }
         @Override protected JClass substituteParams(JTypeVar[] variables, List<JClass> bindings) { return this; }
+
+        // format nonnull annotation with className (bit weird syntax)
+        private String formatGenericNonnull(String nonnullName, String className) {
+            String shortClass = Utils.tryShortenStdClassName(className);
+            if (shortClass != null) {
+                // List<@NotNull String>
+                return "@" + nonnullName + " " + shortClass;
+            }
+            if (className.contains(".")) {
+                int pos = className.lastIndexOf(".");
+                String base = className.substring(0, pos + 1);
+                String name = className.substring(pos + 1);
+                // List<java.lang.@NotNull String>
+                return base + "@" + nonnullName + " " + name;
+            }
+            return "@" + nonnullName + " " + className;
+        }
 
     }
 }
