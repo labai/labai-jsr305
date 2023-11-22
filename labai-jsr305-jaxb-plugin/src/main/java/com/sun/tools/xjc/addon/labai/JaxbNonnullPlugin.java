@@ -16,6 +16,7 @@ import com.sun.xml.xsom.impl.AttributeUseImpl;
 import com.sun.xml.xsom.impl.ParticleImpl;
 import org.xml.sax.ErrorHandler;
 
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Iterator;
@@ -218,13 +219,28 @@ public class JaxbNonnullPlugin extends Plugin {
         }
     }
 
+    private boolean matchByInstrospection(String name, JMethod method) {
+        return method.body()
+                .getContents()
+                .stream()
+                .findFirst()
+                .filter(c -> c instanceof JStatement)
+                .map(c -> {
+                    StringWriter writer = new StringWriter();
+                    JFormatter f = new JFormatter(writer);
+                    ((JStatement) c).state(f);
+                    return writer.toString();
+                })
+                .filter(statement -> statement.contains("return " + name + ";"))
+                .isPresent();
+    }
     private JMethod getGetter(ClassOutline co, JFieldVar field) {
         String capitalizedName = field.name().substring(0, 1).toUpperCase() + field.name().substring(1);
         String getterName = "get" + capitalizedName;
         String booleanName = "is" + capitalizedName;
         // todo make non n^2 algorithm
         JMethod getter = co.implClass.methods().stream()
-                .filter(it -> getterName.equals(it.name()) || booleanName.equals(it.name()))
+                .filter(it -> getterName.equals(it.name()) || booleanName.equals(it.name()) || matchByInstrospection(field.name(), it))
                 .filter(it -> it.params().size() == 0)
                 .findFirst().orElse(null);
         return getter;
