@@ -1,11 +1,6 @@
 package com.sun.tools.xjc.addon.labai;
 
-import com.sun.codemodel.JAnnotationUse;
-import com.sun.codemodel.JClass;
-import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JPackage;
-import com.sun.codemodel.JTypeVar;
+import com.sun.codemodel.*;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
@@ -21,6 +16,7 @@ import com.sun.xml.xsom.impl.AttributeUseImpl;
 import com.sun.xml.xsom.impl.ParticleImpl;
 import org.xml.sax.ErrorHandler;
 
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Iterator;
@@ -80,7 +76,7 @@ public class JaxbNonnullPlugin extends Plugin {
         if (v != null) {
             consumed++;
         }
-        if (v == null && generatePackageDefault) {
+        if (v == null && generatePackageDefault && packageDefaultClass == null) {
             v = DEFAULT_NULLABLE_ANNOTATION;
         }
         if (v != null) {
@@ -97,14 +93,16 @@ public class JaxbNonnullPlugin extends Plugin {
         v = getParameterValue(arg1, PARAM_NONNULL_CLASS);
         if (v != null)
             consumed++;
-        else {
+        else if (nonnullClass == null) {
             v = NOTNULL_ANNOTATION;
         }
-        try {
-            nonnullClass = (Class<? extends Annotation>) Class.forName(v);
-        } catch (Throwable e) {
-            log(e);
-            throw new BadCommandLineException("Invalid '" + PARAM_NONNULL_CLASS + "' value ('" + v + "') - must be Annotation class. Error: " + e.getMessage());
+        if (v != null) {
+            try {
+                nonnullClass = (Class<? extends Annotation>) Class.forName(v);
+            } catch (Throwable e) {
+                log(e);
+                throw new BadCommandLineException("Invalid '" + PARAM_NONNULL_CLASS + "' value ('" + v + "') - must be Annotation class. Error: " + e.getMessage());
+            }
         }
 
         // verbose
@@ -188,13 +186,13 @@ public class JaxbNonnullPlugin extends Plugin {
         boolean required = property.isRequired();
         if ((minOccurs < 0 || minOccurs >= 1 && required && !nillable)
                 || property.isCollection()
-                ) {
+        ) {
             processNonnull(classOutline, field);
         }
     }
 
     private void processListItemNonnull(Outline model, ClassOutline co, JFieldVar field) {
-        JClass origTp = (JClass)field.type();
+        JClass origTp = (JClass) field.type();
         JClass listClass = origTp.getBaseClass(List.class).erasure();
         JClass tp = listClass.narrow(new NonnullGenericClass(model, origTp.getTypeParameters().get(0), nonnullClass.getSimpleName()));
         log("Add @" + nonnullClass.getSimpleName() + " on list " + field.name() + " item of class " + co.implClass.name());
@@ -221,13 +219,28 @@ public class JaxbNonnullPlugin extends Plugin {
         }
     }
 
+    private boolean matchByInstrospection(String name, JMethod method) {
+        return method.body()
+                .getContents()
+                .stream()
+                .findFirst()
+                .filter(c -> c instanceof JStatement)
+                .map(c -> {
+                    StringWriter writer = new StringWriter();
+                    JFormatter f = new JFormatter(writer);
+                    ((JStatement) c).state(f);
+                    return writer.toString();
+                })
+                .filter(statement -> statement.contains("return " + name + ";"))
+                .isPresent();
+    }
     private JMethod getGetter(ClassOutline co, JFieldVar field) {
         String capitalizedName = field.name().substring(0, 1).toUpperCase() + field.name().substring(1);
         String getterName = "get" + capitalizedName;
         String booleanName = "is" + capitalizedName;
         // todo make non n^2 algorithm
         JMethod getter = co.implClass.methods().stream()
-                .filter(it -> getterName.equals(it.name()) || booleanName.equals(it.name()))
+                .filter(it -> getterName.equals(it.name()) || booleanName.equals(it.name()) || matchByInstrospection(field.name(), it))
                 .filter(it -> it.params().size() == 0)
                 .findFirst().orElse(null);
         return getter;
@@ -285,7 +298,7 @@ public class JaxbNonnullPlugin extends Plugin {
 
     private void log(String log) {
         if (verbose) {
-            System.out.println("JaxbJsr305: "+ log);
+            System.out.println("JaxbJsr305: " + log);
         }
     }
 
@@ -297,19 +310,52 @@ public class JaxbNonnullPlugin extends Plugin {
     static class NonnullGenericClass extends JClass {
         private final JClass origTp;
         private final String nonnullName;
+
         public NonnullGenericClass(Outline model, JClass origTp, String nonnullName) {
             super(model.getCodeModel());
             this.origTp = origTp;
             this.nonnullName = nonnullName;
         }
-        @Override public String fullName() { return formatGenericNonnull(nonnullName, origTp.fullName()); }
-        @Override public String name() { return formatGenericNonnull(nonnullName, origTp.name()); }
-        @Override public JPackage _package() { return origTp._package(); }
-        @Override public JClass _extends() { return origTp._extends(); }
-        @Override public Iterator<JClass> _implements() { return origTp._implements(); }
-        @Override public boolean isInterface() { return origTp.isInterface(); }
-        @Override public boolean isAbstract() { return origTp.isAbstract(); }
-        @Override protected JClass substituteParams(JTypeVar[] variables, List<JClass> bindings) { return this; }
+
+        @Override
+        public String fullName() {
+            return formatGenericNonnull(nonnullName, origTp.fullName());
+        }
+
+        @Override
+        public String name() {
+            return formatGenericNonnull(nonnullName, origTp.name());
+        }
+
+        @Override
+        public JPackage _package() {
+            return origTp._package();
+        }
+
+        @Override
+        public JClass _extends() {
+            return origTp._extends();
+        }
+
+        @Override
+        public Iterator<JClass> _implements() {
+            return origTp._implements();
+        }
+
+        @Override
+        public boolean isInterface() {
+            return origTp.isInterface();
+        }
+
+        @Override
+        public boolean isAbstract() {
+            return origTp.isAbstract();
+        }
+
+        @Override
+        protected JClass substituteParams(JTypeVar[] variables, List<JClass> bindings) {
+            return this;
+        }
 
         // format nonnull annotation with className (bit weird syntax)
         private String formatGenericNonnull(String nonnullName, String className) {
