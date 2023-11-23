@@ -42,6 +42,7 @@ public class NonnullTest extends RunXJC2Mojo {
 		args.add("-XJsr305Annotations");
 		args.add("-XJsr305Annotations:generateListItemNonnull=true");
 //		args.add("-XJsr305Annotations:defaultNullableClass=tests.DummyDefaultNullable");
+//		args.add("-XJsr305Annotations:generateDefaultNullable=false");
 //		args.add("-XJsr305Annotations:nonnullClass=tests.DummyNonnull");
 		return args;
 	}

@@ -1,6 +1,13 @@
 package com.sun.tools.xjc.addon.labai;
 
-import com.sun.codemodel.*;
+import com.sun.codemodel.JAnnotationUse;
+import com.sun.codemodel.JClass;
+import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JFormatter;
+import com.sun.codemodel.JMethod;
+import com.sun.codemodel.JPackage;
+import com.sun.codemodel.JStatement;
+import com.sun.codemodel.JTypeVar;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
@@ -18,9 +25,13 @@ import org.xml.sax.ErrorHandler;
 
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /*
  * Augustus, 2021-10-17
@@ -36,13 +47,22 @@ public class JaxbNonnullPlugin extends Plugin {
     private static final String PARAM_DEFAULT_NULLABLE_CLASS = PLUGIN_OPTION_NAME + ":defaultNullableClass";
     private static final String PARAM_NONNULL_CLASS = PLUGIN_OPTION_NAME + ":nonnullClass";
     private static final String PARAM_VERBOSE = PLUGIN_OPTION_NAME + ":verbose";
+    private static final List<String> ALL_PARAMS = Arrays.asList(
+            PARAM_GENERATE_DEFAULT_NULLABLE,
+            PARAM_GENERATE_LIST_ITEM_NULLABLE,
+            PARAM_DEFAULT_NULLABLE_CLASS,
+            PARAM_NONNULL_CLASS,
+            PARAM_VERBOSE);
 
     private static final String NOTNULL_ANNOTATION = "com.github.labai.jsr305x.api.NotNull";
     private static final String DEFAULT_NULLABLE_ANNOTATION = "com.github.labai.jsr305x.api.NullableByDefault";
 
+    private final Map<String, String> cmdArgs = new HashMap<>();
+    private final AtomicBoolean initiated = new AtomicBoolean(false);
+
     private boolean verbose = true;
     private boolean generatePackageDefault = true;
-    private boolean generateListItemcNonnull = false;
+    private boolean generateListItemsNonnull = false;
     private Class<? extends Annotation> packageDefaultClass = null;
     private Class<? extends Annotation> nonnullClass = null;
 
@@ -52,31 +72,37 @@ public class JaxbNonnullPlugin extends Plugin {
     }
 
     @Override
-    public int parseArgument(Options opt, String[] args, int i) throws BadCommandLineException {
+    public int parseArgument(Options opt, String[] args, int i) {
         String arg1 = args[i];
         int consumed = 0;
+        for (String param : ALL_PARAMS) {
+            String v = getParameterValue(arg1, param);
+            if (v != null) {
+                consumed++;
+                cmdArgs.put(param, v);
+            }
+        }
+        return consumed;
+    }
+
+    private void initializeCmdArgs() {
         String v;
 
         // @NullableByDefault
         //
-        v = getParameterValue(arg1, PARAM_GENERATE_DEFAULT_NULLABLE);
+        v = cmdArgs.get(PARAM_GENERATE_DEFAULT_NULLABLE);
         if (v != null) {
             generatePackageDefault = Boolean.parseBoolean(v);
-            consumed++;
         }
 
         // generate list item nonnull, e.g. List<@NotNull Item> list
-        v = getParameterValue(arg1, PARAM_GENERATE_LIST_ITEM_NULLABLE);
+        v = cmdArgs.get(PARAM_GENERATE_LIST_ITEM_NULLABLE);
         if (v != null) {
-            generateListItemcNonnull = Boolean.parseBoolean(v);
-            consumed++;
+            generateListItemsNonnull = Boolean.parseBoolean(v);
         }
 
-        v = getParameterValue(arg1, PARAM_DEFAULT_NULLABLE_CLASS);
-        if (v != null) {
-            consumed++;
-        }
-        if (v == null && generatePackageDefault && packageDefaultClass == null) {
+        v = cmdArgs.get(PARAM_DEFAULT_NULLABLE_CLASS);
+        if (v == null && generatePackageDefault) {
             v = DEFAULT_NULLABLE_ANNOTATION;
         }
         if (v != null) {
@@ -84,36 +110,29 @@ public class JaxbNonnullPlugin extends Plugin {
                 packageDefaultClass = (Class<? extends Annotation>) Class.forName(v);
             } catch (Throwable e) {
                 log(e);
-                throw new BadCommandLineException("Invalid '" + PARAM_DEFAULT_NULLABLE_CLASS + "' value ('" + v + "') - must be Annotation class. Error: " + e.getMessage());
+                throw new RuntimeException("Invalid cmd arg '" + PARAM_DEFAULT_NULLABLE_CLASS + "' value ('" + v + "') - must be Annotation class. Error: " + e.getMessage());
             }
         }
 
         // @Nonnull
         //
-        v = getParameterValue(arg1, PARAM_NONNULL_CLASS);
-        if (v != null)
-            consumed++;
-        else if (nonnullClass == null) {
+        v = cmdArgs.get(PARAM_NONNULL_CLASS);
+        if (v == null) {
             v = NOTNULL_ANNOTATION;
         }
-        if (v != null) {
-            try {
-                nonnullClass = (Class<? extends Annotation>) Class.forName(v);
-            } catch (Throwable e) {
-                log(e);
-                throw new BadCommandLineException("Invalid '" + PARAM_NONNULL_CLASS + "' value ('" + v + "') - must be Annotation class. Error: " + e.getMessage());
-            }
+        try {
+            nonnullClass = (Class<? extends Annotation>) Class.forName(v);
+        } catch (Throwable e) {
+            log(e);
+            throw new RuntimeException("Invalid cmd arg '" + PARAM_NONNULL_CLASS + "' value ('" + v + "') - must be Annotation class. Error: " + e.getMessage());
         }
 
         // verbose
         //
-        v = getParameterValue(arg1, PARAM_VERBOSE);
+        v = cmdArgs.get(PARAM_VERBOSE);
         if (v != null) {
             verbose = Boolean.parseBoolean(v);
-            consumed++;
         }
-
-        return consumed;
     }
 
     @Override
@@ -138,6 +157,10 @@ public class JaxbNonnullPlugin extends Plugin {
 
     @Override
     public boolean run(Outline model, Options opt, ErrorHandler errorHandler) {
+        if (initiated.compareAndSet(false, true)) {
+            initializeCmdArgs();
+        }
+
         if (generatePackageDefault) {
             for (PackageOutline po : model.getAllPackageContexts()) {
                 log("Add @" + packageDefaultClass.getName() + " to package " + po._package().name());
@@ -178,7 +201,7 @@ public class JaxbNonnullPlugin extends Plugin {
         boolean nillable = Utils.toBoolean(Utils.getField("nillable", particle.getTerm()));
         JFieldVar field = classOutline.implClass.fields().get(propertyName(property));
 
-        if (generateListItemcNonnull && property.isCollection()) {
+        if (generateListItemsNonnull && property.isCollection()) {
             processListItemNonnull(model, classOutline, field);
         }
 
@@ -234,6 +257,7 @@ public class JaxbNonnullPlugin extends Plugin {
                 .filter(statement -> statement.contains("return " + name + ";"))
                 .isPresent();
     }
+
     private JMethod getGetter(ClassOutline co, JFieldVar field) {
         String capitalizedName = field.name().substring(0, 1).toUpperCase() + field.name().substring(1);
         String getterName = "get" + capitalizedName;
@@ -373,7 +397,5 @@ public class JaxbNonnullPlugin extends Plugin {
             }
             return "@" + nonnullName + " " + className;
         }
-
     }
 }
-

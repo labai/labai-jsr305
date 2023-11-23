@@ -16,6 +16,8 @@
 			<xs:element nillable="false" name="nillableFalse" type="xs:string"/>
 			<xs:element name="logical" type="xs:boolean"/>
 			<xs:element minOccurs="1" name="isOk" type="xs:boolean"/>
+			<xs:element minOccurs="1" name="static" type="xs:boolean"/>
+			<xs:element minOccurs="1" name="ABC" type="xs:boolean"/>
 		</xs:sequence>
 	</xs:complexType>
 
