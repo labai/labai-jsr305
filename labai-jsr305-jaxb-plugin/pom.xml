@@ -4,7 +4,7 @@
 
 	<groupId>com.github.labai</groupId>
 	<artifactId>labai-jsr305-jaxb-plugin</artifactId>
-	<version>0.0.6</version>
+	<version>0.0.7</version>
 	<packaging>jar</packaging>
 
 	<name>Jsr305 Jaxb plugin</name>
