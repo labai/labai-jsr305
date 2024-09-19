@@ -226,7 +226,7 @@ public class JaxbNonnullPlugin extends Plugin {
         if (getter != null)
             getter.type(tp);
         if (setter != null)
-            setter.params().get(0).type(tp);
+            setter.listParams()[0].type(tp);
     }
 
     private void processNonnull(ClassOutline co, JFieldVar field) {
@@ -238,7 +238,7 @@ public class JaxbNonnullPlugin extends Plugin {
             if (getter != null)
                 getter.annotate(nonnullClass);
             if (setter != null)
-                setter.params().get(0).annotate(nonnullClass);
+                setter.listParams()[0].annotate(nonnullClass);
         }
     }
 
@@ -262,10 +262,10 @@ public class JaxbNonnullPlugin extends Plugin {
         String capitalizedName = field.name().substring(0, 1).toUpperCase() + field.name().substring(1);
         String getterName = "get" + capitalizedName;
         String booleanName = "is" + capitalizedName;
-        // todo make non n^2 algorithm
+
         JMethod getter = co.implClass.methods().stream()
                 .filter(it -> getterName.equals(it.name()) || booleanName.equals(it.name()) || matchByInstrospection(field.name(), it))
-                .filter(it -> it.params().size() == 0)
+                .filter(it -> it.listParams().length == 0)
                 .findFirst().orElse(null);
         return getter;
     }
@@ -275,7 +275,7 @@ public class JaxbNonnullPlugin extends Plugin {
         String setterName = "set" + capitalizedName;
         JMethod setter = co.implClass.methods().stream()
                 .filter(it -> setterName.equals(it.name()))
-                .filter(it -> it.params().size() == 1)
+                .filter(it -> it.listParams().length == 1)
                 .findFirst().orElse(null);
         return setter;
     }
@@ -291,9 +291,9 @@ public class JaxbNonnullPlugin extends Plugin {
         XSComponent definition = property.getSchemaComponent();
         AttributeUseImpl particle = (AttributeUseImpl) definition;
 
-        JFieldVar var = clase.implClass.fields().get(propertyName);
+        JFieldVar fvar = clase.implClass.fields().get(propertyName);
         if (particle.isRequired()) {
-            processNonnull(clase, var);
+            processNonnull(clase, fvar);
         }
     }
 

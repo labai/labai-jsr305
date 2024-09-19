@@ -1,8 +1,8 @@
 package tests;
 
 import org.apache.maven.project.MavenProject;
-import org.jvnet.jaxb2.maven2.AbstractXJC2Mojo;
-import org.jvnet.jaxb2.maven2.test.RunXJC2Mojo;
+import org.jvnet.jaxb.maven.AbstractXJCMojo;
+import org.jvnet.jaxb.maven.test.RunXJCMojo;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ check in generated code:
 		should have @NotNull (where it is required)
 
 */
-public class NonnullTest extends RunXJC2Mojo {
+public class NonnullTest extends RunXJCMojo {
 
 	@Override
 	protected File getGeneratedDirectory() {
@@ -29,7 +29,7 @@ public class NonnullTest extends RunXJC2Mojo {
 	}
 
 	@Override
-	protected void configureMojo(AbstractXJC2Mojo mojo) {
+	protected void configureMojo(AbstractXJCMojo mojo) {
 		super.configureMojo(mojo);
 		mojo.setProject(new MavenProject());
 		mojo.setForceRegenerate(true);
