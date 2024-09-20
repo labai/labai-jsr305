@@ -5,7 +5,7 @@
 
     <groupId>labai-jsr305-example</groupId>
     <artifactId>example3-jaxb-maven-plugin</artifactId>
-    <version>0.1.0</version>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
     <description>Example of usage with org.jvnet.jaxb:jaxb-maven-plugin:4 (jaxb4, java17)</description>
 
@@ -99,7 +99,7 @@
                     <dependency>
                         <groupId>com.github.labai</groupId>
                         <artifactId>labai-jsr305-jaxb-plugin</artifactId>
-                        <version>0.1.0.beta1</version>
+                        <version>0.1.0</version>
                     </dependency>
                     <dependency>
                         <groupId>com.github.labai</groupId>
