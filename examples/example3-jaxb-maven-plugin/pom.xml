@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>labai-jsr305-example</groupId>
-    <artifactId>example3-maven-jaxb-plugin</artifactId>
+    <artifactId>example3-jaxb-maven-plugin</artifactId>
     <version>0.1.0</version>
     <packaging>jar</packaging>
     <description>Example of usage with org.jvnet.jaxb:jaxb-maven-plugin:4 (jaxb4, java17)</description>
@@ -75,7 +75,7 @@
                         </goals>
                         <configuration>
                             <schemaDirectory>src/main/resources/xsd/pain.001.001.11</schemaDirectory>
-                            <generatePackage>example1.generated.pain_001_001_11</generatePackage>
+                            <generatePackage>example3.generated.pain_001_001_11</generatePackage>
                             <forceRegenerate>true</forceRegenerate>
                             <args>
                                 <arg>-XJsr305Annotations</arg>

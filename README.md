@@ -26,41 +26,54 @@ com.github.labai:labai-jsr305x-annotations
 
 And add argument _-XJsr305Annotations_.
 
-See samples/jaxb-kotlin-sample.
+#### Example 
+(see examples/example3-jaxb-maven-plugin)
 
 ```xml
 <plugin>
-    <groupId>org.jvnet.jaxb2.maven2</groupId>
-    <artifactId>maven-jaxb2-plugin</artifactId>
-    <version>0.13.0</version>
+    <groupId>org.jvnet.jaxb</groupId>
+    <artifactId>jaxb-maven-plugin</artifactId>
+    <version>4.0.8</version>
+
     <configuration>
         <args>
             <arg>-extension</arg>
-            <arg>-XJsr305Annotations</arg>
-            <arg>-XJsr305Annotations:generateListItemNonnull=true</arg>
+            <arg>-Xnamespace-prefix</arg>
         </args>
     </configuration>
-
     <executions>
         <execution>
-            <id>xsd1</id>
+            <id>xsd.pain.001.001.11</id>
             <phase>generate-sources</phase>
             <goals>
                 <goal>generate</goal>
             </goals>
             <configuration>
-                <schemaDirectory>src/main/resources/xsd/samplexsd</schemaDirectory>
-                <generatePackage>sample.generated.samplexsd</generatePackage>
+                <schemaDirectory>src/main/resources/xsd/pain.001.001.11</schemaDirectory>
+                <generatePackage>example3.generated.pain_001_001_11</generatePackage>
                 <forceRegenerate>true</forceRegenerate>
+                <args>
+                    <arg>-XJsr305Annotations</arg>
+                    <arg>-XJsr305Annotations:generateListItemNonnull=true</arg>
+                </args>
             </configuration>
         </execution>
     </executions>
-
     <dependencies>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>4.0.5</version>
+        </dependency>
         <dependency>
             <groupId>com.github.labai</groupId>
             <artifactId>labai-jsr305-jaxb-plugin</artifactId>
-            <version>0.0.5</version>
+            <version>0.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.labai</groupId>
