@@ -99,13 +99,13 @@ You may want to use another NotNull annotation
 (e.g. kotlin supports a couple of them: https://kotlinlang.org/docs/java-interop.html#nullability-annotations).
 Then you may provide additional parameters:
 
-| Parameter | Description | Default
-| :--- | :--- | :---
-| -XJsr305Annotations:nonnullClass | @Notnull annotation on field, method or parameter | @com.github.labai.jsr305x.api.NotNull
-| -XJsr305Annotations:defaultNullableClass | @NullableByDefault on package-info.java (default for all package) | @com.github.labai.jsr305x.api.NullableByDefault
-| -XJsr305Annotations:generateDefaultNullable | generate @NullableByDefault | true |
-| -XJsr305Annotations:generateListItemNonnull | generate @NotNull for list items, e.g. List<@NotNull Item> | false |
-| -XJsr305Annotations:verbose | More logs | true |
+| Parameter                                   | Description                                                       | Default                                         |
+|:--------------------------------------------|:------------------------------------------------------------------|:------------------------------------------------|
+| -XJsr305Annotations:nonnullClass            | @Notnull annotation on field, method or parameter                 | @com.github.labai.jsr305x.api.NotNull           |
+| -XJsr305Annotations:defaultNullableClass    | @NullableByDefault on package-info.java (default for all package) | @com.github.labai.jsr305x.api.NullableByDefault |
+| -XJsr305Annotations:generateDefaultNullable | generate @NullableByDefault                                       | true                                            |
+| -XJsr305Annotations:generateListItemNonnull | generate @NotNull for list items, e.g. List<@NotNull Item>        | false                                           |
+| -XJsr305Annotations:verbose                 | More logs                                                         | true                                            |
 
 An example:
 
@@ -115,3 +115,7 @@ An example:
 <arg>-XJsr305Annotations:generateListItemNonnull=true</arg>
 ```
 
+### Versions
+
+- 0.1.x - Jakarta Jaxb4, Java17+
+- 0.0.x - Jaxb2, Java8
